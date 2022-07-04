@@ -47,6 +47,14 @@ const getWorkout = async (req, res) => {
 }
 
 const createWorkout = async (req, res) => {
+    const { title, reps, load } = req.body;
+    if (!title || !reps || !load) {
+        return res.status(400).json({
+            payload: null,
+            message: 'Missing required fields!',
+            success: false
+        });
+    }
     try {
         const payload = await Workout.create(req.body);
         res.status(201).json({
@@ -73,7 +81,7 @@ const updateWorkout = async (req, res) => {
         });
     }
     try {
-        const body = await Workout.findByIdAndUpdate(id, req.body);
+        const body = await Workout.findByIdAndUpdate(id, {...req.body});
         if (!body) {
             return res.status(404).json({
                 payload: null,
@@ -108,16 +116,14 @@ const deleteWorkout = async (req, res) => {
         });
     }
 
-    const workout = await Workout.findById(id);
-    if (!workout) {
+    const body = await Workout.findByIdAndDelete(id);
+    if (!body) {
         return res.status(404).json({
             payload: null,
             message: 'Record not found!',
             success: false
         })
     }
-
-    const body = await Workout.findByIdAndDelete(id);
     res.status(200).json({
         payload: body,
         message: 'Successfully Deleted!',
